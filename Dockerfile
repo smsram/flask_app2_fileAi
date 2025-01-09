@@ -7,14 +7,21 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install system dependencies (if required)
+RUN apt-get update && apt-get install -y --no-install-recommends gcc && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Make port 5000 available to the world outside this container
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Expose the port the app runs on
 EXPOSE 5000
 
-# Define environment variable
+# Set the Flask app environment variable
 ENV FLASK_APP=app.py
 
-# Run the application
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+# Set a default environment variable for production
+ENV FLASK_ENV=production
+
+# Run the application with Gunicorn
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:5000", "--workers", "4", "--threads", "2"]

@@ -1,0 +1,8 @@
+Flask
+python-dotenv
+google-generativeai
+Pillow
+PyPDF2
+Flask-Cors
+requests
+gunicorn
